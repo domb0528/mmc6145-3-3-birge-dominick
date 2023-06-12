@@ -1,7 +1,7 @@
 import BookPreview from "../../components/bookPreview";
 import { useState, useRef,useEffect } from 'react'
 import styles from './style.module.css'
-import { useQuery } from "react-query";
+
 
 export default function Search() {
   // stores search results
@@ -18,15 +18,17 @@ export default function Search() {
   // TODO: When the Search Page loads, use useEffect to fetch data from:
   // https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY
   // Use a query of "React"
-  async function loadBooks(q){
-    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=${q}`)
+  async function loadBooks(){
+    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=${previousQuery}`)
     const data = await res.json()
      setBookSearchResults(data.items)
      setFetching(false)
     }
 
   useEffect(() => {
-    loadBooks("React")
+    setPreviousQuery("React")
+    setFetching(true)
+    loadBooks()
   }, [])
 
   // TODO: Write a submit handler for the form that fetches data from:
@@ -37,8 +39,8 @@ export default function Search() {
   // the query is unchanged
   async function handleSubmit(e) {
     e.preventDefault()
-   
-      loadBooks()
+    loadBooks
+    
    
   }
 
