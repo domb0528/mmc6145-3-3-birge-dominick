@@ -27,7 +27,7 @@ export default function Search() {
 
   useEffect(() => {
     loadBooks("React")
-  }, [inputRef])
+  }, [])
 
   // TODO: Write a submit handler for the form that fetches data from:
   // https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY
@@ -38,7 +38,7 @@ export default function Search() {
   async function handleSubmit(e) {
     e.preventDefault()
    
-      loadBooks(previousQuery)
+      loadBooks()
    
   }
 
