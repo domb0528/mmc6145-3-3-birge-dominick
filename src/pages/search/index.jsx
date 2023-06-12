@@ -18,17 +18,15 @@ export default function Search() {
   // TODO: When the Search Page loads, use useEffect to fetch data from:
   // https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY
   // Use a query of "React"
-  async function loadBooks(){
-    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=${previousQuery}`)
+  async function loadBooks(q){
+    const res = await fetch(`https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=${q}`)
     const data = await res.json()
      setBookSearchResults(data.items)
-     setFetching(false)
     }
 
   useEffect(() => {
-    setPreviousQuery("React")
-    setFetching(true)
-    loadBooks()
+   setPreviousQuery("React")
+    loadBooks(previousQuery)
   }, [])
 
   // TODO: Write a submit handler for the form that fetches data from:
@@ -39,14 +37,15 @@ export default function Search() {
   // the query is unchanged
   async function handleSubmit(e) {
     e.preventDefault()
-    loadBooks
+    if(query!=="" || query!==previousQuery)
+      loadBooks(query)
     
    
   }
 
   async function handleChange(){
-    if(!fetching)
-      setPreviousQuery(inputRef.current.value)
+      setPreviousQuery(query)
+      setQuery(inputRef.current.value)
   }
 
   return (
