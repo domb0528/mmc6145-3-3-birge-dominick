@@ -11,12 +11,16 @@ export default function Search() {
   const [previousQuery, setPreviousQuery] = useState()
   // used to prevent rage clicks on form submits
   const [fetching, setFetching] = useState(false)
+  
+  // TODO: When the Search Page loads, use useEffect to fetch data from:
+  // https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY
+  // Use a query of "React"
 
-  useEffect(() => {
+    useEffect(() => {
     setFetching(true)
     async function loadBooks(){
       try {
-        const res = await fetch('https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY')
+        const res = await fetch('https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=React')
         const data = await res.json()
         setBookSearchResults(data.items)
         setFetching(false)
@@ -25,11 +29,6 @@ export default function Search() {
       }
     }
     loadBooks()}, [])
-    
-
-  // TODO: When the Search Page loads, use useEffect to fetch data from:
-  // https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY
-  // Use a query of "React"
 
   // TODO: Write a submit handler for the form that fetches data from:
   // https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY
@@ -46,7 +45,7 @@ export default function Search() {
         return
       }
       setFetching(true)
-      const res =await fetch('https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY')
+      const res =await fetch('https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=' + query)
       const data =await res.json()
       setBookSearchResults(data.items)
       setFetching(false)
@@ -65,7 +64,22 @@ export default function Search() {
     <main className={styles.search}>
       <h1>Book Search</h1>
       {/* TODO: add an onSubmit handler */}
-      <form className={styles.form}>
+      <form className={styles.form} onSubmit={async (e) => {
+          e.preventDefault()
+          try {
+            if(fetching == true || previousQuery == query || query == ""){
+              return
+            }
+            setFetching(true)
+            const res = await fetch('https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=' + query)
+            const data = await res.json()
+            setBookSearchResults(data.items)
+            setFetching(false)
+            setPreviousQuery(query)
+          } catch {
+
+          }
+        }}>
         <label htmlFor="book-search">Search by author, title, and/or keywords:</label>
         <div ref={inputDivRef}>
           {/* TODO: add value and onChange props to the input element based on query/setQuery */}
@@ -74,6 +88,7 @@ export default function Search() {
             type="text"
             name="book-search"
             id="book-search"
+            onChange={(event) => {setQuery(event.target.value)}}
             />
           <button type="submit">Submit</button>
         </div>
