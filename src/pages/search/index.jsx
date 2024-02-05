@@ -89,6 +89,7 @@ export default function Search() {
             name="book-search"
             id="book-search"
             onChange={(event) => {setQuery(event.target.value)}}
+            value={query}
             />
           <button type="submit">Submit</button>
         </div>
