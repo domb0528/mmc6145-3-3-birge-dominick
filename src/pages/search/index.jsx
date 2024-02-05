@@ -1,16 +1,31 @@
 import BookPreview from "../../components/bookPreview";
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import styles from './style.module.css'
 
 export default function Search() {
   // stores search results
   const [bookSearchResults, setBookSearchResults] = useState()
   // stores value of input field
-  const [query, setQuery] = useState("")
+  const [query, setQuery] = useState("React")
   // compare to query to prevent repeat API calls
   const [previousQuery, setPreviousQuery] = useState()
   // used to prevent rage clicks on form submits
   const [fetching, setFetching] = useState(false)
+
+  useEffect(() => {
+    setFetching(true)
+    async function loadBooks(){
+      try {
+        const res = await fetch('https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY')
+        const data = await res.json()
+        setBookSearchResults(data.items)
+        setFetching(false)
+        setPreviousQuery(query)
+      } catch {
+      }
+    }
+    loadBooks()}, [])
+    
 
   // TODO: When the Search Page loads, use useEffect to fetch data from:
   // https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY
@@ -22,6 +37,26 @@ export default function Search() {
   // This function MUST prevent repeat searches if:
   // fetch has not finished
   // the query is unchanged
+
+  useEffect(() => {
+
+  async function loadBooks(){
+    try {
+      if( fetching == true || previousQuery == query){
+        return
+      }
+      setFetching(true)
+      const res =await fetch('https://www.googleapis.com/books/v1/volumes?langRestrict=en&maxResults=16&q=YOUR_QUERY')
+      const data =await res.json()
+      setBookSearchResults(data.items)
+      setFetching(false)
+      setPreviousQuery(query)
+    } catch{
+      
+    }
+   }
+  loadBooks()
+}, [])
 
   const inputRef = useRef()
   const inputDivRef = useRef()
@@ -52,6 +87,12 @@ export default function Search() {
         : bookSearchResults?.length
         ? <div className={styles.bookList}>
             {/* TODO: render BookPreview components for each search result here based on bookSearchResults */}
+         {bookSearchResults.map(item => <div key={item.id}><BookPreview
+          title={item.volumeInfo.title}
+          authors={item.volumeInfo.authors}
+          thumbnail={item.volumeInfo?.imageLinks?.thumbnail}
+          previewLink={item.volumeInfo.previewLink}/>
+          </div>)}
           </div>
         : <NoResults
           {...{inputRef, inputDivRef, previousQuery}}
